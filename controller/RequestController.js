@@ -2,7 +2,8 @@ import { Request } from "../models/requestSchema.js";
 import { Book } from "../models/BookSchema.js";
 import { catchAsyncErrors } from "../midleware/catchAsyncError.js";
 
-export const sendRequest = catchAsyncErrors(async (req, res, next) => {
+// Send a request for a book
+export const sendRequest = catchAsyncErrors(async (req, res) => {
   const { message, book } = req.body;
 
   if (!message) {
@@ -17,18 +18,15 @@ export const sendRequest = catchAsyncErrors(async (req, res, next) => {
   const newRequest = await Request.create({
     message,
     book,
-    sender: req.user?._id || null, 
-    receiver: bookDoc.user._id,   
+    sender: req.user?._id || null,
+    receiver: bookDoc.user._id,
   });
 
-  res.status(201).json({
-    success: true,
-    request: newRequest,
-  });
+  res.status(201).json({ success: true, request: newRequest });
 });
 
-
-export const getAllRequests = catchAsyncErrors(async (req, res, next) => {
+// Get all requests for logged-in user
+export const getAllRequests = catchAsyncErrors(async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ success: false, message: "Login required" });
   }
@@ -38,8 +36,5 @@ export const getAllRequests = catchAsyncErrors(async (req, res, next) => {
     .populate("book")
     .populate("sender", "email");
 
-  res.status(200).json({
-    success: true,
-    requests,
-  });
+  res.status(200).json({ success: true, requests });
 });
